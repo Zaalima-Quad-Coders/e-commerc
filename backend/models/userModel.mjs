@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     password:{
         type: String,
         required:[true,"please Enter your password"],
-        minLenght:[8,"Password should be greater than 8 characters"],
+        minLength:[8,"Password should be greater than 8 characters"],
         select: false
     },
     avatar:{
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")){
-        next();
+        return next();
     }
     this.password = await bcryptjs.hash(this.password, 10);
     next();

@@ -8,7 +8,7 @@ export const verifyUserAuth = handleAsynError(async (req, res, next) => {
     if (!token) {
         return next(new HandleError("Please login to access this resource", 401));
     }
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET_KEY);
     req.user = await User.findById(decodedData.id);
     next();
 });
