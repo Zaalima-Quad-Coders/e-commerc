@@ -9,12 +9,16 @@ export default (err, req, res, next) => {
         const message = `Resource not found. Invalid: ${err.path}`;
         err = new HandleError(message, 400);
     }
-
+    //duplicate key error
+    if(err.code === 11000){
+        const message = `This ${Object.keys(err.keyValue)} already exists. Please Login to continue`;
+        err = new HandleError(message, 400);
+    }
 
     res.status(err.statusCode).json({
         success: false,
         message: err.message,
-        message: err.stack
+        // message: err.stack
     });
 }       
          
