@@ -44,13 +44,13 @@ const userSchema = new mongoose.Schema({
 
 //password hashing
 
-userSchema.pre("save", async function(next){
+userSchema.pre("save", async function(){
     if(!this.isModified("password")){
-        return next();
+        return;
     }
     this.password = await bcryptjs.hash(this.password, 10);
-    next();
-});
+
+});       
 
 userSchema.methods.getJWTToken = function(){
     return jwt.sign({id: this._id}, process.env.JWT_SECRET_KEY,{

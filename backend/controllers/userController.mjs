@@ -6,8 +6,7 @@ import { sendToken } from "../utils/jwtToken.mjs";
 import { sendEmail } from "../utils/sendEmail.mjs";
 
 export const registerUser = handleAsynError(async (req, res, next) => {
-    const { name, email, password } = req.body; 
-
+    const { name, email, password } = req.body;   
     const user = await User.create({ 
         name,
         email, 
