@@ -3,11 +3,14 @@ import React,{useState} from 'react'
 import { Link } from 'react-router-dom'
 import '../componentStyles/Navbar.css'
 import { Close, Menu, PersonAdd, Search, ShoppingCart } from '@mui/icons-material';
+import '../pageStyles/Search.css'
 // import SearchIcon from '@mui/icons-material/Search';
 
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSearchOpen,setIsSearchopen] = useState(false);
+    const [searchQuery,setSearcQuery] = useState("");
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
     const isAuthenticated = false ; // Replace with actual authentication logic
@@ -28,7 +31,7 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-icons">
-                {/* <div className="search-container">
+                <div className="search-container">
                     <form className='search-form'>
                         <input type="text"
                         className='search-input'
@@ -37,7 +40,7 @@ const Navbar = () => {
                             <Search focusable="false"/>
                         </button>
                     </form>
-                </div> */}
+                </div>
 
                 <div className="cart-container">
                     <Link to="/cart">
