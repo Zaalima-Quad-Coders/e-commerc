@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import '../pageStyles/Products.css'
 import PageTitle from '../components/PageTitle'
 import Navbar from '../components/Navbar'
@@ -7,22 +7,28 @@ import { useDispatch, useSelector } from 'react-redux'
 import Product from '../components/Product'
 import { getProduct, removeErrors } from '../features/products/productSlice.mjs'
 import Loder from '../components/Loder'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import NoProducts from '../components/NoProducts'
+import Pagination from '../components/Pagination'
 
 
 const Products = () => {
-    const { loading, error, products } = useSelector(state => state.product);
+    const { loading, error, products,resultPerPage,productCount } = useSelector(state => state.product);
     const dispatch = useDispatch();
     const location = useLocation()
     const searchParams = new URLSearchParams(location.search)
     const keyword = searchParams.get("keyword")
+    const category = searchParams.get("category")
+    const pageFromURl = parseInt(searchParams.get("page"),10) || 1
 
+    const [currentPage ,setCurrentPage] = useState(pageFromURl);
+    const navigate = useNavigate();
+    const categories = ["laptop" ,"mobile ","tv","fruits","glass"]
 
     useEffect(()=>{
-            dispatch(getProduct({keyword}))
-        },[dispatch,keyword])
+            dispatch(getProduct({keyword,page:currentPage,category}))
+        },[dispatch,keyword,currentPage,category])
 
      useEffect(()=>{
             if(error){
@@ -30,6 +36,27 @@ const Products = () => {
                 dispatch(removeErrors())
             }
         },[dispatch,error])
+
+        const handlePageChange = (page)=>{
+            if(page!==currentPage){
+                setCurrentPage(page);
+                const newSearchParams = new URLSearchParams(location.search)
+
+                if (page === 1){
+                    newSearchParams.delete('page')
+                }else{
+                    newSearchParams.set('page',page)
+                }
+                navigate(`?${newSearchParams.toString()}`)
+            }
+        }
+
+        const handleCategoryClick = (category)=>{
+            const newSearchParams = new URLSearchParams(location.search);
+            newSearchParams.set('category',category)
+             newSearchParams.delete('page')
+             navigate(`?${newSearchParams.toString()}`)
+        }
     
     return (
         <>
@@ -39,6 +66,16 @@ const Products = () => {
             <div className="products-layout">
                 <div className="filter-section">
                     <h3 className="filter-heading">Category</h3>
+                    <ul>
+                        {
+                            categories.map((category)=>{
+                                return(
+                                    <li key = {category} onClick={()=>handleCategoryClick(category)}>{category}</li>
+                                )
+                            })
+                        }
+                    </ul>
+
                 </div>
                 <div className="products-section">
                    {products.length>0?(<div className="products-product-container">
@@ -47,6 +84,11 @@ const Products = () => {
                         ))}
                     </div>):(<NoProducts keyword={keyword}/>
                 )}
+                <Pagination
+                currentPage={currentPage}
+                onPageChange ={handlePageChange}
+
+                />
                 </div>
             </div>
             <Footer />
