@@ -4,16 +4,22 @@ import HandleError from "../utils/handleError.mjs";
 import User from "../models/userModel.mjs"
 import { sendToken } from "../utils/jwtToken.mjs";
 import { sendEmail } from "../utils/sendEmail.mjs";
+import {v2 as cloudinary} from 'cloudinary'
 
 export const registerUser = handleAsynError(async (req, res, next) => {
-    const { name, email, password } = req.body;   
+    const { name, email, password, avatar } = req.body;  
+    const myCloud = await  cloudinary.uploader.upload(avatar,{
+        folder:"avatars",
+        width :150,
+        crop: "scale"
+    })
     const user = await User.create({ 
         name,
         email, 
         password, 
         avatar: { 
-            public_id: "this is a sample id", 
-            url: "profilepicUrl" 
+            public_id: myCloud.public_id, 
+            url: myCloud.secure_url
         }
     });
     sendToken(user, 201, res);
@@ -67,7 +73,7 @@ export const requestPasswordReset = handleAsynError(async (req, res, next) => {
     } catch (error) {
         return next(new HandleError("Could not save reset token,try again later", 500));
     }
-    const resetPasswordUrl = `http://localhost/api/v1/reset${resetToken}`;
+    const resetPasswordUrl = `${req.protocol}://${req.get('host')}/reset/${resetToken}`;
     const message = `Your password reset token is as follow:\n\n${resetPasswordUrl}\n\nIf you have not requested this email, then ignore it.`;
     try {
         await sendEmail({
@@ -134,11 +140,26 @@ export const updateUserPassword = handleAsynError(async (req, res, next) => {
 
 //Update User Profile
 export const updateUserProfile = handleAsynError(async (req, res, next) => {
-    const {name, email} = req.body;
+    const {name, email,avatar} = req.body;
     const newUserData = {
         name,
         email,
     };
+    if(avatar!==""){
+        const user= await User.findById(req.user.id);
+        const imageId = user.avatar.public_id
+        await cloudinary.uploader.destroy(imageId)
+        const myCloud = await cloudinary.uploader.upload(avatar,{
+            folder:"avatars",
+            width:150,
+            crop:'scale'
+        })
+     newUserData = {
+        public_id : myCloud.public_id,
+        url : myCloud.secure_url,
+     }
+
+    }
     const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
         new: true,
         runValidators: true,

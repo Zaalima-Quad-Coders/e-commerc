@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import '../componentStyles/Navbar.css'
 import { Close, Menu, PersonAdd, Search, ShoppingCart } from '@mui/icons-material';
 import '../pageStyles/Search.css'
+import { useSelector } from 'react-redux';
 // import SearchIcon from '@mui/icons-material/Search';
 
 
@@ -13,7 +14,7 @@ const Navbar = () => {
     const [searchQuery,setSearcQuery] = useState("");
     const toggleSearch = ()=>setIsSearchOpen(!isSearchOpen)
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-    const isAuthenticated = false ; // Replace with actual authentication logic
+    const {isAuthenticated} =useSelector(state=>state.user) 
     const navigate= useNavigate();
     const handleSearchSubmit =(e)=>{
         e.preventDefault();

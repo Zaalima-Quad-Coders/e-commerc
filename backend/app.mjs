@@ -4,7 +4,7 @@ import user from './routes/userRoutes.mjs';
 import order from './routes/orderRoutes.mjs';
 import errorHandleMiddleware from './middleware/error.mjs'; 
 import cookieParser from 'cookie-parser';
-
+import fileUpload from 'express-fileupload';
 
 const app = express();
 
@@ -12,6 +12,7 @@ const app = express();
 // Middleware to parse JSON requests
 app.use(express.json());
 app.use(cookieParser());
+app.use(fileUpload())
 
 // routes
 app.use("/api/v1", product);
